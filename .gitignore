@@ -47,5 +47,9 @@ Temporary Items
 *.dcu
 *.local
 *.identcache
+*.~dpr
+*.~ddp
+*.~pas
+*.~dfm
 __history/
 
