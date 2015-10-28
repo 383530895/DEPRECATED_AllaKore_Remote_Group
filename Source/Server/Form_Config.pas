@@ -5,8 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
   Controls, Forms, Dialogs, StdCtrls,
-  Buttons, ExtCtrls, registry,  acPNG,
-  Spin;
+  Buttons, ExtCtrls, registry,  Spin;
 
 type
   Tfrm_Config = class(TForm)
@@ -15,9 +14,6 @@ type
     tmrCheck: TTimer;
     lblPort: TLabel;
     sePort: TSpinEdit;
-    TopBackground_Image: TImage;
-    Label1: TLabel;
-    PasswordIcon_Image: TImage;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormShow(Sender: TObject);
