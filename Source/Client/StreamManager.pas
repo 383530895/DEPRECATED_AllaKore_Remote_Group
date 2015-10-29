@@ -1,4 +1,4 @@
-﻿unit StreamManager;
+unit StreamManager;
 
 interface
 
@@ -23,6 +23,7 @@ implementation
 begin
   Bitmap.Canvas.StretchDraw(Rect(0, 0, NewWidth, NewHeight), Bitmap);
   Bitmap.SetSize(NewWidth, NewHeight);
+
   Result := Bitmap;
 end;  }
 
