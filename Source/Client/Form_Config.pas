@@ -5,8 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Samples.Spin,
-  Vcl.Buttons, Vcl.Imaging.pngimage, Vcl.ExtCtrls, registry, uProxy,
-  dxGDIPlusClasses;
+  Vcl.Buttons, Vcl.Imaging.pngimage, Vcl.ExtCtrls, registry, uProxy;
 
 type
   Tfrm_Config = class(TForm)
@@ -27,13 +26,16 @@ type
     cbxLanguage: TComboBox;
     TopBackground_Image: TImage;
     Label1: TLabel;
-    PasswordIcon_Image: TImage;
     gbxProxy: TGroupBox;
     lblHostProxy: TLabel;
     lblPortProxy: TLabel;
     edtHostProxy: TEdit;
     sePortProxy: TSpinEdit;
     chkEnableProxy: TCheckBox;
+    Label2: TLabel;
+    edtUrlUpdates: TEdit;
+    Logo_Image: TImage;
+    Title1_Label: TLabel;
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
     procedure FormShow(Sender: TObject);
@@ -176,6 +178,8 @@ begin
     SaveIni(cProxy, cYes, ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, True)
   else
     SaveIni(cProxy, cNO, ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, True);
+
+  SaveIni(cUrlUpdates, edtUrlUpdates.Text, ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, False);
 
   Host              := edtHost.Text;
   Port              := sePort.Value;

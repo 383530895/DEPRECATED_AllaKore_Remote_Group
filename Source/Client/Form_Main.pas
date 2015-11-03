@@ -24,7 +24,8 @@ uses
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
   Vcl.StdCtrls, Vcl.Buttons, System.Win.ScktComp, StreamManager, ZLIBEX,
   sndkey32, IdBaseComponent, Vcl.AppEvnts, Vcl.ComCtrls, Winapi.MMSystem,
-  Registry, Vcl.Menus, Vcl.Mask, Clipbrd, uProxy;
+  Registry, Vcl.Menus, Vcl.Mask, Clipbrd, uProxy, IdComponent, IdTCPConnection,
+  IdTCPClient,Shellapi, IdHTTP,iwSystem;
 
 type
   TThread_Connection_Main = class(TThread)
@@ -92,6 +93,10 @@ type
     mniMinimiser: TMenuItem;
     mniClose: TMenuItem;
     TicServer: TTrayIcon;
+    mmAtual: TMemo;
+    mmNova: TMemo;
+    Time_Update: TTimer;
+    IdHTTP1: TIdHTTP;
     procedure Connect_BitBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Reconnect_TimerTimer(Sender: TObject);
@@ -116,10 +121,13 @@ type
     procedure mniMinimiserClick(Sender: TObject);
     procedure mniCloseClick(Sender: TObject);
     procedure TicServerDblClick(Sender: TObject);
+    procedure Time_UpdateTimer(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
+    procedure checksUpdates;
   public
-    MyID: string;
+    MyID,URL: string;
     MyPassword: string;
     Viewer: Boolean;
     ResolutionTargetWidth, ResolutionTargetHeight: Integer;
@@ -234,6 +242,36 @@ end;
 procedure Tfrm_Main.About_BitBtnClick(Sender: TObject);
 begin
   Application.MessageBox('This software has created by Maickonn Richard and source code are free!' + #13 + #13'Any questions, contact-me: senjaxus@gmail.com' + #13#13 + 'My Github: https://www.github.com/Senjaxus', 'About AllaKore Remote', 64);
+end;
+
+procedure Tfrm_Main.checksUpdates;
+var
+arquivo,caminho : string;
+MyFile : TFileStream;
+
+begin
+  caminho:= URL; //local onde estará o arquivo versaoatual.txt
+  arquivo:= 'versaoatual.txt'; //nome do arquivo a ser baixado (versaoatual.txt)
+  MyFile := TFileStream.Create('versaoatual.txt', fmCreate); // cria o versaoatual.txt
+  try
+    idHTTP1.Get(caminho + 'versaoatual.txt', MyFile); //baixando versaoatual.txt
+  finally
+  MyFile.Free;
+  {CARREGA VERSAOATUAL E VERSAO.TXT NOS MEMOS}
+  mmAtual.Lines.LoadFromFile('versaoatual.txt'); // carregar o versaoatual.txt no memo2
+  mmNova.Lines.LoadFromFile('versao.txt'); // carrega o versao.txt no memo3
+  {verifica a versao}
+if mmAtual.Lines [0] <> mmNova.Lines[0] then
+begin
+  if Application.MessageBox('There is a new version of the system,' + #13#10 +
+    'You want to upgrade your system?', 'Update!!', MB_YESNO +
+    MB_ICONINFORMATION) = IDYES then
+  begin
+    ShellExecute(handle,'open',PChar('Update.exe'), '','',SW_SHOWNORMAL);
+  end;
+
+END
+  end;
 end;
 
 procedure Tfrm_Main.ClearConnection;
@@ -640,6 +678,8 @@ begin
   // Insert version on Caption of the Form
   Caption := Caption + ' - ' + GetAppVersionStr;
 
+  SaveIni(cVersion, Caption,  ExtractFilePath(Application.ExeName) + Application.Title+'.ini',cGeneral,False);
+
   //Marcones Freitas - 17/10/2015 -> Se o Client foi Aberto pelo Servidor, Alimenta as Variaveis
   if (ParamCount > 0) then
       begin
@@ -683,6 +723,20 @@ begin
   ResolutionTargetHeight  := 600;
   SetOffline;
   Reconnect;
+
+  mmAtual.Visible := False;
+  mmNova.Visible  := False;
+end;
+
+procedure Tfrm_Main.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+ if(Key = VK_F7)then
+   begin
+       frm_Config              := Tfrm_Config.Create(self);
+       frm_Config.ShowModal;
+       FreeAndNil(frm_Config);
+   end;
 end;
 
 procedure Tfrm_Main.Keyboard_SocketConnect(Sender: TObject; Socket: TCustomWinSocket);
@@ -823,6 +877,17 @@ begin
   Inc(Timeout);
 end;
 
+
+procedure Tfrm_Main.Time_UpdateTimer(Sender: TObject);
+begin
+Time_Update.Enabled := False;
+
+URL := GetIni(gsAppPath + 'Allakore_remote_client.ini', cGeneral, cUrlUpdates, False);
+if((URL <> '0') and (URL <> ''))then
+  begin
+  checksUpdates;
+  end;
+end;
 
 // Connection are Main
 procedure TThread_Connection_Main.Execute;
