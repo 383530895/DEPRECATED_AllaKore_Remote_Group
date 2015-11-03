@@ -1,0 +1,4 @@
+Na pasta do projeto é obrigatorio ter um aquivo chamado versao.txt
+
+No Servidor onde vai ficar hospedado a atualização é preciso ser
+versaoatual.txt e update.txt

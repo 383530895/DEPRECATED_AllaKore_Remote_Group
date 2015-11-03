@@ -12,11 +12,13 @@ object frm_Main: Tfrm_Main
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
   PopupMenu = pm1
   Position = poDesktopCenter
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
   object TopBackground_Image: TImage
@@ -12882,6 +12884,22 @@ object frm_Main: Tfrm_Main
     Text = '   -   -   '
     OnKeyPress = TargetID_MaskEditKeyPress
   end
+  object mmAtual: TMemo
+    Left = 79
+    Top = 347
+    Width = 68
+    Height = 36
+    TabOrder = 4
+    Visible = False
+  end
+  object mmNova: TMemo
+    Left = 153
+    Top = 348
+    Width = 68
+    Height = 36
+    TabOrder = 5
+    Visible = False
+  end
   object Reconnect_Timer: TTimer
     Interval = 5000
     OnTimer = Reconnect_TimerTimer
@@ -12968,5 +12986,28 @@ object frm_Main: Tfrm_Main
     OnDblClick = TicServerDblClick
     Left = 32
     Top = 224
+  end
+  object Time_Update: TTimer
+    Interval = 3000
+    OnTimer = Time_UpdateTimer
+    Left = 192
+    Top = 88
+  end
+  object IdHTTP1: TIdHTTP
+    AllowCookies = True
+    ProxyParams.BasicAuthentication = False
+    ProxyParams.ProxyPort = 0
+    Request.ContentLength = -1
+    Request.ContentRangeEnd = -1
+    Request.ContentRangeStart = -1
+    Request.ContentRangeInstanceLength = -1
+    Request.Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+    Request.BasicAuthentication = False
+    Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
+    Request.Ranges.Units = 'bytes'
+    Request.Ranges = <>
+    HTTPOptions = [hoForceEncodeParams]
+    Left = 227
+    Top = 88
   end
 end

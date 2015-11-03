@@ -18,6 +18,8 @@ interface
  cProxy              = 'Proxy';
  cHostProxy          = 'HostProxy';
  cPortProxy          = 'PortProxy';
+ cVersion            = 'Version';
+ cUrlUpdates         = 'UrlUpdates';
 
  procedure SaveIni(Param, Value, ArqFile, Name: String; encrypted: Boolean);
  function GetIni(Path, Key, KeyValue : string; encrypted: Boolean): string;
