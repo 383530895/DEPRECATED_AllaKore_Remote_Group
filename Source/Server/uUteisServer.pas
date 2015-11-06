@@ -127,10 +127,7 @@ begin
   AMac := RemoveChrInvalidos(mac);
   AHD := RemoveChrInvalidos(mac);
 
-  S := AMac + AHD; // sem o caracteres inválidos
-
-  S := LetToNum(S); // Trocado as letras pelos numeros;
-//  Memo1.Lines.Add(s);
+  S := LetToNum(AMac + AHD); // Trocando as letras pelos numeros;
 
   sID1 := Copy(s,StrToIntDef(Copy(s,1,1),1),2);
   sID2 := Copy(s,StrToIntDef(Copy(s,10,1),2),3);

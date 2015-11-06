@@ -180,6 +180,7 @@ begin
     LongRec(FixedPtr.dwFileVersionLS).Lo]) //build
 end;
 
+function GenerateID(strMAC, strHD:string): string;
 var
   i: Integer;
   ID: string;
