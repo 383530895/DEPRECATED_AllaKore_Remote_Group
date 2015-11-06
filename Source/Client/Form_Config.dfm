@@ -4076,7 +4076,6 @@ object frm_Config: Tfrm_Config
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    StyleElements = [seClient, seBorder]
   end
   object Label2: TLabel
     Left = 42
@@ -8621,7 +8620,6 @@ object frm_Config: Tfrm_Config
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    StyleElements = [seClient, seBorder]
   end
   object edtMachineName: TEdit
     Left = 114

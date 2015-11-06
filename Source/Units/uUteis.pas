@@ -32,10 +32,15 @@ interface
  procedure ShowApplication;
  procedure CloseAplication;
 
+ // Add 05/11/2015 - Solivan Araujo
+  Function SerialNumHardDisk(FDrive: String): String;
+  Function SystemDrive: string;
+  Function MacAddress: string;
+
 var
  xLanguage : Integer;
  Languages : TLanguage;
- Host, vGroup, vMachine : string;
+ Host, vGroup, vMachine, vMAC, vHD : string;
  Port, ConnectionTimeout : Integer;
  vParID, vParSenha: string;
  FirstExecute : Boolean;
@@ -121,6 +126,13 @@ begin
       Languages.TargetID_Label     := String(GetIni(IniFile +'\Pt_Br.ini','CAPTIONS','TargetID_Label',false));
       Languages.Language_Label     := String(GetIni(IniFile +'\Pt_Br.ini','CAPTIONS','Language_Label',false));
      end
+     else
+     begin
+      Languages.YourID_Label       := 'Sua ID';
+      Languages.YourPassword_Label := 'Senha';
+      Languages.TargetID_Label     := 'ID do Parceiro';
+      Languages.Language_Label     := 'Português';
+     end;
 
 end;
 
@@ -244,6 +256,55 @@ begin
  Application.ProcessMessages;
  if Application.MessageBox(PChar('Confirm close the Application?'), PChar(frm_Main.Caption), mb_YesNo + mb_DefButton2 + mb_IconQuestion) = IdYes then
     Halt;
+end;
+
+Function MacAddress: string;
+var
+  Lib: Cardinal;
+  Func: function(GUID: PGUID): longint; stdcall;
+  GUID1, GUID2: TGUID;
+
+begin
+  Result := '';
+  Lib := LoadLibrary('rpcrt4.dll');
+  if Lib <> 0 then
+  begin
+    @Func := GetProcAddress(Lib, 'UuidCreateSequential');
+    if assigned(Func) then
+    begin
+      if (Func(@GUID1) = 0) and (Func(@GUID2) = 0) and (GUID1.D4[2] = GUID2.D4[2]) and (GUID1.D4[3] = GUID2.D4[3]) and (GUID1.D4[4] = GUID2.D4[4]) and (GUID1.D4[5] = GUID2.D4[5])
+        and (GUID1.D4[6] = GUID2.D4[6]) and (GUID1.D4[7] = GUID2.D4[7]) then
+      begin
+        Result := IntToHex(GUID1.D4[2], 2) + '-' + IntToHex(GUID1.D4[3], 2) + '-' + IntToHex(GUID1.D4[4], 2) + '-' + IntToHex(GUID1.D4[5], 2) + '-' + IntToHex(GUID1.D4[6], 2) + '-'
+          + IntToHex(GUID1.D4[7], 2);
+      end;
+    end;
+  end;
+end;
+
+function SystemDrive: string;
+var
+  DirWin, SystemDriv: string;
+begin
+  SetLength(DirWin, MAX_PATH);
+  GetSystemDirectory(PChar(DirWin), MAX_PATH);
+  SystemDriv := Copy(DirWin, 1, 3);
+  Result := SystemDriv
+
+end;
+
+Function SerialNumHardDisk(FDrive: String): String;
+Var
+  Serial: DWORD;
+  DirLen, Flags: DWORD;
+  DLabel: Array [0 .. 11] of Char;
+begin
+  Try
+    GetVolumeInformation(PChar(Copy(FDrive, 1, 1) + ':\'), DLabel, 12, @Serial, DirLen, Flags, nil, 0);
+    Result := IntToHex(Serial, 8);
+  Except
+    Result := '';
+  end;
 end;
 
 end.

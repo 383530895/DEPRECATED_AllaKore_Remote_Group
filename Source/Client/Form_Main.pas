@@ -1,20 +1,18 @@
 ﻿{
+
 
+  This source has created by Maickonn Richard.
+  Any questions, contact-me: senjaxus@gmail.com
 
-      This source has created by Maickonn Richard.
-      Any questions, contact-me: senjaxus@gmail.com
+  My Github: https://www.github.com/Senjaxus
 
-      My Github: https://www.github.com/Senjaxus
-
-      Are totally free!
+  Are totally free!
 
 
 
 }
 
-
 {$R ResFile.res}
-
 unit Form_Main;
 
 interface
@@ -25,7 +23,7 @@ uses
   Vcl.StdCtrls, Vcl.Buttons, System.Win.ScktComp, StreamManager, ZLIBEX,
   sndkey32, IdBaseComponent, Vcl.AppEvnts, Vcl.ComCtrls, Winapi.MMSystem,
   Registry, Vcl.Menus, Vcl.Mask, Clipbrd, uProxy, IdComponent, IdTCPConnection,
-  IdTCPClient,Shellapi, IdHTTP,iwSystem;
+  IdTCPClient, Shellapi, IdHTTP, iwSystem, dxGDIPlusClasses;
 
 type
   TThread_Connection_Main = class(TThread)
@@ -57,20 +55,6 @@ type
 
 type
   Tfrm_Main = class(TForm)
-    TopBackground_Image: TImage;
-    Logo_Image: TImage;
-    Title1_Label: TLabel;
-    Title2_Label: TLabel;
-    GroupBox1: TGroupBox;
-    background_label_Image: TImage;
-    YourID_Label: TLabel;
-    YourPassword_Label: TLabel;
-    background_label_Image2: TImage;
-    YourID_Edit: TEdit;
-    YourPassword_Edit: TEdit;
-    background_label_Image3: TImage;
-    TargetID_Label: TLabel;
-    Connect_BitBtn: TBitBtn;
     Status_Image: TImage;
     Status_Label: TLabel;
     Bevel1: TBevel;
@@ -84,8 +68,6 @@ type
     Keyboard_Socket: TClientSocket;
     Files_Socket: TClientSocket;
     Timeout_Timer: TTimer;
-    About_BitBtn: TBitBtn;
-    TargetID_MaskEdit: TMaskEdit;
     Clipboard_Timer: TTimer;
     pm1: TPopupMenu;
     mniConfig: TMenuItem;
@@ -97,6 +79,16 @@ type
     mmNova: TMemo;
     Time_Update: TTimer;
     IdHTTP1: TIdHTTP;
+    TargetID_Label: TLabel;
+    TargetID_MaskEdit: TMaskEdit;
+    Connect_BitBtn: TBitBtn;
+    GroupBox1: TGroupBox;
+    background_label_Image: TImage;
+    YourID_Label: TLabel;
+    background_label_Image2: TImage;
+    YourPassword_Label: TLabel;
+    YourID_Edit: TEdit;
+    YourPassword_Edit: TEdit;
     procedure Connect_BitBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Reconnect_TimerTimer(Sender: TObject);
@@ -113,7 +105,6 @@ type
     procedure Files_SocketConnect(Sender: TObject; Socket: TCustomWinSocket);
     procedure Timeout_TimerTimer(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure About_BitBtnClick(Sender: TObject);
     procedure TargetID_MaskEditKeyPress(Sender: TObject; var Key: Char);
     procedure Clipboard_TimerTimer(Sender: TObject);
     procedure mniConfigClick(Sender: TObject);
@@ -123,11 +114,12 @@ type
     procedure TicServerDblClick(Sender: TObject);
     procedure Time_UpdateTimer(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure About_BitBtnClick(Sender: TObject);
   private
     { Private declarations }
     procedure checksUpdates;
   public
-    MyID,URL: string;
+    MyID, URL: string;
     MyPassword: string;
     Viewer: Boolean;
     ResolutionTargetWidth, ResolutionTargetHeight: Integer;
@@ -146,7 +138,6 @@ var
   OldWallpaper: string;
   Accessed, LostConnection: Boolean;
   OldClipboardText: string;
-
 
 implementation
 
@@ -185,6 +176,7 @@ begin
 end;
 
 
+
 // Get current Version
 function GetAppVersionStr: string;
 var
@@ -202,10 +194,10 @@ begin
     RaiseLastOSError;
   if not VerQueryValue(Buffer, '\', Pointer(FixedPtr), Size) then
     RaiseLastOSError;
-  Result := Format('%d.%d.%d.%d', [LongRec(FixedPtr.dwFileVersionMS).Hi,  //major
-    LongRec(FixedPtr.dwFileVersionMS).Lo,  //minor
-    LongRec(FixedPtr.dwFileVersionLS).Hi,  //release
-    LongRec(FixedPtr.dwFileVersionLS).Lo]) //build
+  Result := Format('%d.%d.%d.%d', [LongRec(FixedPtr.dwFileVersionMS).Hi, // major
+    LongRec(FixedPtr.dwFileVersionMS).Lo, // minor
+    LongRec(FixedPtr.dwFileVersionLS).Hi, // release
+    LongRec(FixedPtr.dwFileVersionLS).Lo]) // build
 end;
 
 function GetWallpaperDirectory: string;
@@ -246,31 +238,29 @@ end;
 
 procedure Tfrm_Main.checksUpdates;
 var
-arquivo,caminho : string;
-MyFile : TFileStream;
+  arquivo, caminho: string;
+  MyFile: TFileStream;
 
 begin
-  caminho:= URL; //local onde estará o arquivo versaoatual.txt
-  arquivo:= 'versaoatual.txt'; //nome do arquivo a ser baixado (versaoatual.txt)
+  caminho := URL; // local onde estará o arquivo versaoatual.txt
+  arquivo := 'versaoatual.txt'; // nome do arquivo a ser baixado (versaoatual.txt)
   MyFile := TFileStream.Create('versaoatual.txt', fmCreate); // cria o versaoatual.txt
   try
-    idHTTP1.Get(caminho + 'versaoatual.txt', MyFile); //baixando versaoatual.txt
+    IdHTTP1.Get(caminho + 'versaoatual.txt', MyFile); // baixando versaoatual.txt
   finally
-  MyFile.Free;
-  {CARREGA VERSAOATUAL E VERSAO.TXT NOS MEMOS}
-  mmAtual.Lines.LoadFromFile('versaoatual.txt'); // carregar o versaoatual.txt no memo2
-  mmNova.Lines.LoadFromFile('versao.txt'); // carrega o versao.txt no memo3
-  {verifica a versao}
-if mmAtual.Lines [0] <> mmNova.Lines[0] then
-begin
-  if Application.MessageBox('There is a new version of the system,' + #13#10 +
-    'You want to upgrade your system?', 'Update!!', MB_YESNO +
-    MB_ICONINFORMATION) = IDYES then
-  begin
-    ShellExecute(handle,'open',PChar('Update.exe'), '','',SW_SHOWNORMAL);
-  end;
+    MyFile.Free;
+    { CARREGA VERSAOATUAL E VERSAO.TXT NOS MEMOS }
+    mmAtual.Lines.LoadFromFile('versaoatual.txt'); // carregar o versaoatual.txt no memo2
+    mmNova.Lines.LoadFromFile('versao.txt'); // carrega o versao.txt no memo3
+    { verifica a versao }
+    if mmAtual.Lines[0] <> mmNova.Lines[0] then
+    begin
+      if Application.MessageBox('There is a new version of the system,' + #13#10 + 'You want to upgrade your system?', 'Update!!', MB_YESNO + MB_ICONINFORMATION) = IDYES then
+      begin
+        ShellExecute(Handle, 'open', PChar('Update.exe'), '', '', SW_SHOWNORMAL);
+      end;
 
-END
+    END
   end;
 end;
 
@@ -344,7 +334,7 @@ begin
 
     if (Clipboard.HasFormat(CF_TEXT)) then
     begin
-      if not (OldClipboardText = Clipboard.AsText) then
+      if not(OldClipboardText = Clipboard.AsText) then
       begin
         OldClipboardText := Clipboard.AsText;
         Main_Socket.Socket.SendText('<|REDIRECT|><|CLIPBOARD|>' + Clipboard.AsText + '<<|');
@@ -369,7 +359,6 @@ begin
   else if bytes > 1073741824 then
     Result := FloatToStrF(bytes / 1073741824, ffFixed, 10, 1) + ' GB';
 end;
-
 
 // Function to List Folders
 function ListFolders(Directory: string): string;
@@ -457,7 +446,7 @@ begin
   end;
 
   // Show main form and repaint
-  if not (Visible) then
+  if not(Visible) then
   begin
     Show;
     Repaint;
@@ -476,12 +465,12 @@ begin
   YourPassword_Edit.Enabled := false;
 
   TargetID_MaskEdit.Clear;
-  TargetID_MaskEdit.Enabled := False;
+  TargetID_MaskEdit.Enabled := false;
 
   Connect_BitBtn.Enabled := false;
 
   Timeout_Timer.Enabled := false;
-  Clipboard_Timer.Enabled := False;
+  Clipboard_Timer.Enabled := false;
 
 end;
 
@@ -496,7 +485,7 @@ begin
     YourPassword_Edit.Enabled := false;
 
     TargetID_MaskEdit.Clear;
-    TargetID_MaskEdit.Enabled := False;
+    TargetID_MaskEdit.Enabled := false;
 
     Connect_BitBtn.Enabled := false;
   end;
@@ -506,7 +495,7 @@ procedure Tfrm_Main.SetOnline;
 begin
 
   YourID_Edit.Text := MyID;
-  YourID_Edit.Enabled := True;
+  YourID_Edit.Enabled := true;
 
   YourPassword_Edit.Text := MyPassword;
   YourPassword_Edit.Enabled := true;
@@ -516,12 +505,12 @@ begin
 
   Connect_BitBtn.Enabled := true;
 
-  //Marcones Freitas - 17/10/2015 -> Ao Conectar se as Variaveis estiverem preenchidas Abre a tela de Senha
-  if (vParID <> '') and (vParSenha <> '' )then
-     begin
-      TargetID_MaskEdit.Text := vParID;
-      frm_Main.Main_Socket.Socket.SendText('<|CHECKIDPASSWORD|>' + TargetID_MaskEdit.Text + '<|>' + vParSenha + '<<|');
-     end;
+  // Marcones Freitas - 17/10/2015 -> Ao Conectar se as Variaveis estiverem preenchidas Abre a tela de Senha
+  if (vParID <> '') and (vParSenha <> '') then
+  begin
+    TargetID_MaskEdit.Text := vParID;
+    frm_Main.Main_Socket.Socket.SendText('<|CHECKIDPASSWORD|>' + TargetID_MaskEdit.Text + '<|>' + vParSenha + '<<|');
+  end;
 end;
 
 // Compress Stream with zLib
@@ -539,7 +528,7 @@ begin
   outbuffer := nil;
 
   if not assigned(SrcStream) then
-    exit;
+    Exit;
 
   try
     InputStream := TMemoryStream.Create;
@@ -562,13 +551,13 @@ begin
 end;
 
 // Decompress Stream with zLib
-function DeCompressStream(SrcStream: TMemoryStream): boolean;
+function DeCompressStream(SrcStream: TMemoryStream): Boolean;
 var
   InputStream, OutputStream: TMemoryStream;
   inbuffer, outbuffer: Pointer;
   count, outcount: longint;
 begin
-  result := false;
+  Result := false;
 
   InputStream := nil;
   OutputStream := nil;
@@ -576,7 +565,7 @@ begin
   outbuffer := nil;
 
   if not assigned(SrcStream) then
-    exit;
+    Exit;
 
   try
     InputStream := TMemoryStream.Create;
@@ -590,7 +579,7 @@ begin
     OutputStream.Write(outbuffer^, outcount);
     SrcStream.Clear;
     SrcStream.LoadFromStream(OutputStream);
-    result := true;
+    Result := true;
   finally
     FreeAndNil(InputStream);
     FreeAndNil(OutputStream);
@@ -606,14 +595,14 @@ end;
 
 procedure Tfrm_Main.Connect_BitBtnClick(Sender: TObject);
 begin
-  if not (TargetID_MaskEdit.Text = '   -   -   ') then
+  if not(TargetID_MaskEdit.Text = '  -   -   ') then
   begin
     if (TargetID_MaskEdit.Text = MyID) then
       Application.MessageBox('You can not connect with yourself!', 'AllaKore Remote', 16)
     else
     begin
       Main_Socket.Socket.SendText('<|FINDID|>' + TargetID_MaskEdit.Text + '<<|');
-      TargetID_MaskEdit.Enabled := False;
+      TargetID_MaskEdit.Enabled := false;
       Connect_BitBtn.Enabled := false;
       Status_Image.Picture.Assign(Image1.Picture);
       Status_Label.Caption := 'Finding the ID...';
@@ -664,79 +653,84 @@ end;
 procedure Tfrm_Main.FormCreate(Sender: TObject);
 begin
   try
-   if ActiveProcess(Application.Title) then
+    if ActiveProcess(Application.Title) then
       raise Exception.Create('There is already a process running');
 
-   FirstExecute := True;
-  except on E: Exception do
+    FirstExecute := true;
+  except
+    on E: Exception do
     Begin
       ShowMessage(E.Message);
       Application.Terminate;
     End;
   end;
-  FirstExecute := True;
+  FirstExecute := true;
   // Insert version on Caption of the Form
   Caption := Caption + ' - ' + GetAppVersionStr;
 
-  SaveIni(cVersion, Caption,  ExtractFilePath(Application.ExeName) + Application.Title+'.ini',cGeneral,False);
+  SaveIni(cVersion, Caption, ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, false);
 
-  //Marcones Freitas - 17/10/2015 -> Se o Client foi Aberto pelo Servidor, Alimenta as Variaveis
+  // Marcones Freitas - 17/10/2015 -> Se o Client foi Aberto pelo Servidor, Alimenta as Variaveis
   if (ParamCount > 0) then
-      begin
-       vParID    := ParamStr(1);
-       vParSenha := ParamStr(2);
-      end;
+  begin
+    vParID := ParamStr(1);
+    vParSenha := ParamStr(2);
+  end;
 
-  //Marcones Freitas - 16/10/2015 -> Se for a primeira Execução do Client, abre a Tela de Configurações para setar os parametros do arquivo ini
-  if (GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cHost, True) = '') or
-     (GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cHost, True) = '0') then
-     begin
-       Reconnect_Timer.Enabled := False;
-       frm_Config              := Tfrm_Config.Create(self);
-       frm_Config.ShowModal;
-       FreeAndNil(frm_Config);
-     end;
-
-  //Marcones Freitas - 16/10/2015 -> Get the Parameters file ini
-  Host              := GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cHost, True);
-  Port              := StrToInt(GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cPort, True));
-  vGroup            := GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cGroup, True);
-  vMachine          := GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cMachine, True);
-  ConnectionTimeout := StrToInt(GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cConnectTimeOut, True));
-  Proxy             := GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cProxy, true) = '1';
-
-  if Proxy then
+  // Marcones Freitas - 16/10/2015 -> Se for a primeira Execução do Client, abre a Tela de Configurações para setar os parametros do arquivo ini
+   if (GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cHost, True) = '') or
+    (GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cHost, True) = '0') then
     begin
-      HostProxy := GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cHostProxy, true);
-      PortProxy := StrToInt(GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cPortProxy, true));
-    end
-  else
-    begin
-      HostProxy := '';
-      PortProxy := 0;
+    Reconnect_Timer.Enabled := False;
+    frm_Config              := Tfrm_Config.Create(self);
+    frm_Config.ShowModal;
+    FreeAndNil(frm_Config);
     end;
 
+  // Marcones Freitas - 16/10/2015 -> Get the Parameters file ini
+  Host := GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cHost, true);
+  Port := StrToInt(GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cPort, true));
+  vGroup := GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cGroup, true);
+  vMachine := GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cMachine, true);
+  ConnectionTimeout := StrToInt(GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cConnectTimeOut, true));
+  Proxy := GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cProxy, true) = '1';
+
+  vMAC := MacAddress;
+  vHD := SerialNumHardDisk(SystemDrive);
+
+  Proxy := false;
+
+  if Proxy then
+  begin
+    HostProxy := GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cHostProxy, true);
+    PortProxy := StrToInt(GetIni(ExtractFilePath(Application.ExeName) + Application.Title + '.ini', cGeneral, cPortProxy, true));
+  end
+  else
+  begin
+    HostProxy := '';
+    PortProxy := 0;
+  end;
+
   SetLanguage;
-  Reconnect_Timer.Enabled := True;
+  Reconnect_Timer.Enabled := true;
   SetHostPortGroupMach;
-  ResolutionTargetWidth   := 986;
-  ResolutionTargetHeight  := 600;
+  ResolutionTargetWidth := 986;
+  ResolutionTargetHeight := 600;
   SetOffline;
   Reconnect;
 
-  mmAtual.Visible := False;
-  mmNova.Visible  := False;
+  mmAtual.Visible := false;
+  mmNova.Visible := false;
 end;
 
-procedure Tfrm_Main.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
+procedure Tfrm_Main.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
- if(Key = VK_F7)then
-   begin
-       frm_Config              := Tfrm_Config.Create(self);
-       frm_Config.ShowModal;
-       FreeAndNil(frm_Config);
-   end;
+  if (Key = VK_F7) then
+  begin
+    frm_Config := Tfrm_Config.Create(self);
+    frm_Config.ShowModal;
+    FreeAndNil(frm_Config);
+  end;
 end;
 
 procedure Tfrm_Main.Keyboard_SocketConnect(Sender: TObject; Socket: TCustomWinSocket);
@@ -774,7 +768,7 @@ begin
 
   Timeout_Timer.Enabled := true;
 
-  Socket.SendText('<|MAINSOCKET|>'+'<|GROUP|>' + vGroup + '<<|'+'<|MACHINE|>' + vMachine + '<<|');
+  Socket.SendText('<|MAINSOCKET|>' + '<|GROUP|>' + vGroup + '<<|' + '<|MACHINE|>' + vMachine + '<<|' + '<|MAC|>' + vMAC + '<<|' + '<|HD|>' + vHD + '<<|');
 
   Thread_Connection_Main := TThread_Connection_Main.Create(Socket);
   Thread_Connection_Main.Resume;
@@ -815,16 +809,16 @@ end;
 
 procedure Tfrm_Main.mniConfigClick(Sender: TObject);
 begin
- Reconnect_Timer.Enabled := False;
- frm_Config              := Tfrm_Config.Create(self);
- frm_Config.ShowModal;
- FreeAndNil(frm_Config);
- Reconnect_Timer.Enabled := True;
+  Reconnect_Timer.Enabled := false;
+  frm_Config := Tfrm_Config.Create(self);
+  frm_Config.ShowModal;
+  FreeAndNil(frm_Config);
+  Reconnect_Timer.Enabled := true;
 end;
 
 procedure Tfrm_Main.mniMinimiserClick(Sender: TObject);
 begin
- HideApplication;
+  HideApplication;
 end;
 
 procedure Tfrm_Main.mniShowClick(Sender: TObject);
@@ -858,7 +852,7 @@ end;
 
 procedure Tfrm_Main.TicServerDblClick(Sender: TObject);
 begin
- ShowApplication;
+  ShowApplication;
 end;
 
 procedure Tfrm_Main.Timeout_TimerTimer(Sender: TObject);
@@ -877,15 +871,14 @@ begin
   Inc(Timeout);
 end;
 
-
 procedure Tfrm_Main.Time_UpdateTimer(Sender: TObject);
 begin
-Time_Update.Enabled := False;
+  Time_Update.Enabled := false;
 
-URL := GetIni(gsAppPath + 'Allakore_remote_client.ini', cGeneral, cUrlUpdates, False);
-if((URL <> '0') and (URL <> ''))then
+  URL := GetIni(gsAppPath + 'RDPView.ini', cGeneral, cUrlUpdates, false);
+  if ((URL <> '0') and (URL <> '')) then
   begin
-  checksUpdates;
+    checksUpdates;
   end;
 end;
 
@@ -908,16 +901,15 @@ begin
   while Socket.Connected do
   begin
 
-  
     try
       if (Socket.ReceiveLength > 0) then
       begin
         s := Socket.ReceiveText;
 
-  // Received data, then resets the timeout
+        // Received data, then resets the timeout
         Timeout := 0;
 
-  // If receive ID, are Online
+        // If receive ID, are Online
         if (Pos('<|ID|>', s) > 0) then
         begin
           s2 := s;
@@ -930,7 +922,7 @@ begin
 
           Synchronize(frm_Main.SetOnline);
 
-    // If this Socket are connected, then connect the Desktop Socket, Keyboard Socket, File Download Socket and File Upload Socket
+          // If this Socket are connected, then connect the Desktop Socket, Keyboard Socket, File Download Socket and File Upload Socket
           Synchronize(
             procedure
             begin
@@ -945,14 +937,13 @@ begin
             end);
         end;
 
-
-  // Ping
+        // Ping
         if (Pos('<|PING|>', s) > 0) then
         begin
           Socket.SendText('<|PONG|>');
         end;
 
-  // Warns access and remove Wallpaper
+        // Warns access and remove Wallpaper
         if (Pos('<|ACCESSING|>', s) > 0) then
         begin
           OldWallpaper := GetWallpaperDirectory;
@@ -1075,21 +1066,15 @@ begin
             end);
         end;
 
+        { Redirected commands }
 
-
-
-
-
-
-  { Redirected commands }
-
-  // Desktop Remote
+        // Desktop Remote
         if (Pos('<|RESOLUTION|>', s) > 0) then
         begin
           s2 := s;
           Delete(s2, 1, Pos('<|RESOLUTION|>', s2) + 13);
 
-          frm_Main.ResolutionTargetWidth := strToInt(Copy(s2, 1, Pos('<|>', s2) - 1));
+          frm_Main.ResolutionTargetWidth := StrToInt(Copy(s2, 1, Pos('<|>', s2) - 1));
           Delete(s2, 1, Pos('<|>', s2) + 2);
 
           frm_Main.ResolutionTargetHeight := StrToInt(Copy(s2, 1, Pos('<<|', s2) - 1));
@@ -1209,9 +1194,8 @@ begin
           Delete(s2, 1, Pos('<|WHEELMOUSE|>', s2) + 13);
 
           s2 := Copy(s2, 1, Pos('<<|', s2) - 1);
-          mouse_event(MOUSEEVENTF_WHEEL, 0, 0, DWORD(StrToInt(s2)), 0);
+          Mouse_Event(MOUSEEVENTF_WHEEL, 0, 0, DWORD(StrToInt(s2)), 0);
         end;
-
 
         // Clipboard Remote
         if (Pos('<|CLIPBOARD|>', s) > 0) then
@@ -1229,10 +1213,7 @@ begin
           end;
         end;
 
-
-
-		
-  // Chat
+        // Chat
         if (Pos('<|CHAT|>', s) > 0) then
         begin
           s2 := s;
@@ -1276,13 +1257,13 @@ begin
 
                 SendMessage(Chat_RichEdit.Handle, WM_VSCROLL, SB_BOTTOM, 0);
 
-                if not (Visible) then
+                if not(Visible) then
                 begin
                   PlaySound('BEEP', 0, SND_RESOURCE or SND_ASYNC);
                   Show;
                 end;
 
-                if not (Active) then
+                if not(Active) then
                 begin
                   PlaySound('BEEP', 0, SND_RESOURCE or SND_ASYNC);
                   FlashWindow(frm_Main.Handle, true);
@@ -1292,9 +1273,8 @@ begin
             end);
         end;
 
-
-  // Share Files
-  // Request Folder List
+        // Share Files
+        // Request Folder List
         if (Pos('<|GETFOLDERS|>', s) > 0) then
         begin
           s2 := s;
@@ -1305,7 +1285,7 @@ begin
           Socket.SendText('<|REDIRECT|><|FOLDERLIST|>' + ListFolders(s2) + '<<|FOLDERLIST');
         end;
 
-  //Request Files List
+        // Request Files List
         if (Pos('<|GETFILES|>', s) > 0) then
         begin
           s2 := s;
@@ -1316,7 +1296,7 @@ begin
           Socket.SendText('<|REDIRECT|><|FILESLIST|>' + ListFiles(s2, '*.*') + '<<|FILESLIST');
         end;
 
-  // Receive Folder List
+        // Receive Folder List
         if (Pos('<|FOLDERLIST|>', s) > 0) then
         begin
 
@@ -1343,7 +1323,7 @@ begin
             begin
               frm_ShareFiles.ShareFiles_ListView.Clear;
             end);
-          for i := 0 to FoldersAndFiles.Count - 1 do
+          for i := 0 to FoldersAndFiles.count - 1 do
           begin
             Synchronize(
               procedure
@@ -1359,7 +1339,7 @@ begin
                   L.Caption := FoldersAndFiles.Strings[i];
                   L.ImageIndex := 1;
                 end;
-                frm_ShareFiles.Caption := 'Share Files - ' + IntToStr(frm_ShareFiles.ShareFiles_ListView.Items.Count) + ' Items found';
+                frm_ShareFiles.Caption := 'Share Files - ' + IntToStr(frm_ShareFiles.ShareFiles_ListView.Items.count) + ' Items found';
               end);
             Sleep(5); // Effect
           end;
@@ -1368,7 +1348,7 @@ begin
           Socket.SendText('<|REDIRECT|><|GETFILES|>' + frm_ShareFiles.Directory_Edit.Text + '<<|');
         end;
 
-  // Receive Files List
+        // Receive Files List
         if (Pos('<|FILESLIST|>', s) > 0) then
         begin
 
@@ -1389,7 +1369,7 @@ begin
           FoldersAndFiles.Text := Copy(s2, 1, Pos('<<|', s2) - 1);
           FoldersAndFiles.Sort;
 
-          for i := 0 to FoldersAndFiles.Count - 1 do
+          for i := 0 to FoldersAndFiles.count - 1 do
           begin
             Synchronize(
               procedure
@@ -1432,7 +1412,7 @@ begin
                 else
                   L.ImageIndex := 2;
 
-                frm_ShareFiles.Caption := 'Share Files - ' + IntToStr(frm_ShareFiles.ShareFiles_ListView.Items.Count) + ' Items found';
+                frm_ShareFiles.Caption := 'Share Files - ' + IntToStr(frm_ShareFiles.ShareFiles_ListView.Items.count) + ' Items found';
               end);
             Sleep(5); // Effect
           end;
@@ -1442,7 +1422,7 @@ begin
             procedure
             begin
               frm_ShareFiles.Directory_Edit.Enabled := true;
-              frm_ShareFiles.Caption := 'Share Files - ' + IntToStr(frm_ShareFiles.ShareFiles_ListView.Items.Count) + ' Items found';
+              frm_ShareFiles.Caption := 'Share Files - ' + IntToStr(frm_ShareFiles.ShareFiles_ListView.Items.count) + ' Items found';
             end);
 
         end;
@@ -1458,7 +1438,7 @@ begin
             procedure
             begin
               frm_ShareFiles.Upload_ProgressBar.Position := StrToInt(s2);
-              frm_ShareFiles.SizeUpload_Label.Caption := 'Size: ' + getSize(frm_ShareFiles.Upload_ProgressBar.Position) + ' / ' + GetSize(frm_ShareFiles.Upload_ProgressBar.Max);
+              frm_ShareFiles.SizeUpload_Label.Caption := 'Size: ' + GetSize(frm_ShareFiles.Upload_ProgressBar.Position) + ' / ' + GetSize(frm_ShareFiles.Upload_ProgressBar.Max);
             end);
         end;
 
@@ -1470,7 +1450,7 @@ begin
               with frm_ShareFiles do
               begin
                 Upload_ProgressBar.Position := 0;
-                Upload_BitBtn.Enabled := True;
+                Upload_BitBtn.Enabled := true;
                 Directory_Edit.Enabled := false;
                 frm_ShareFiles.SizeUpload_Label.Caption := 'Size: 0 B / 0 B';
               end;
@@ -1493,7 +1473,7 @@ begin
           s2 := Copy(s2, 1, Pos('<<|', s2) - 1);
 
           FileToUpload := TFileStream.Create(s2, fmOpenRead);
-          frm_Main.Files_Socket.Socket.SendText('<|SIZE|>' + intToStr(FileToUpload.Size) + '<<|');
+          frm_Main.Files_Socket.Socket.SendText('<|SIZE|>' + IntToStr(FileToUpload.Size) + '<<|');
           frm_Main.Files_Socket.Socket.SendStream(FileToUpload);
         end;
 
@@ -1515,8 +1495,7 @@ begin
     begin
       s := Socket.ReceiveText;
 
-
-  // Combo Keys
+      // Combo Keys
       if (Pos('<|ALTDOWN|>', s) > 0) then
       begin
         s := StringReplace(s, '<|ALTDOWN|>', '', [rfReplaceAll]);
@@ -1572,15 +1551,12 @@ begin
   end;
 end;
 
-
-
-
 // Connection of Desktop screens
 procedure TThread_Connection_Desktop.Execute;
 var
   s, s2: string;
   MyFirstBmp, MySecondBmp, MyCompareBmp, UnPackStream, MyTempStream, PackStream: TMemoryStream;
-  ReceiveBmpSize, SendBMPSize: int64;
+  ReceiveBmpSize, SendBMPSize: Int64;
   ReceivingBmp: Boolean;
 begin
   inherited;
@@ -1616,10 +1592,8 @@ begin
             ResolutionWidth := Screen.Width;
             ResolutionHeight := Screen.Height;
 
-			
             frm_Main.Main_Socket.Socket.SendText('<|REDIRECT|><|RESOLUTION|>' + IntToStr(Screen.Width) + '<|>' + IntToStr(Screen.Height) + '<<|');
 
-			
             ReceiveBmpSize := 0;
             MyFirstBmp.Clear;
             UnPackStream.Clear;
@@ -1637,14 +1611,14 @@ begin
 
             MyFirstBmp.Position := 0;
             PackStream.LoadFromStream(MyFirstBmp);
-			
+
             CompressStream(PackStream);
             CompressStream(PackStream);
 
             PackStream.Position := 0;
             SendBMPSize := PackStream.Size;
-			
-            Socket.SendText('<|SIZE|>' + intToStr(SendBMPSize) + '<<|' + MemoryStreamToString(PackStream));
+
+            Socket.SendText('<|SIZE|>' + IntToStr(SendBMPSize) + '<<|' + MemoryStreamToString(PackStream));
           end;
 
           if (Pos('<|GETPARTSCREENSHOT|>', s) > 0) then
@@ -1663,10 +1637,10 @@ begin
 
             PackStream.Position := 0;
             SendBMPSize := PackStream.Size;
-            Socket.SendText('<|SIZE|>' + intToStr(SendBMPSize) + '<<|' + MemoryStreamToString(PackStream));
+            Socket.SendText('<|SIZE|>' + IntToStr(SendBMPSize) + '<<|' + MemoryStreamToString(PackStream));
           end;
 
-          if not (ReceivingBmp) then
+          if not(ReceivingBmp) then
           begin
             if (Pos('<|SIZE|>', s) > 0) then
             begin
@@ -1678,7 +1652,7 @@ begin
 
               Delete(s, 1, Pos('<<|', s) + 2);
               ReceivingBmp := true;
-			  
+
               Synchronize(
                 procedure
                 begin
@@ -1741,11 +1715,11 @@ begin
               MyCompareBmp.Clear;
               PackStream.Clear;
               ReceivingBmp := false;
-			  
+
             end;
-		
+
           end;
-		  
+
         end;
       except
       end;
@@ -1763,7 +1737,6 @@ begin
   end;
 end;
 
-
 // Connection of Share Files
 procedure TThread_Connection_Files.Execute;
 var
@@ -1775,10 +1748,10 @@ begin
   inherited;
 
   try
-  
+
     ReceivingFile := false;
     FileStream := nil;
-	
+
     while Socket.Connected do
     begin
       try
@@ -1786,7 +1759,7 @@ begin
         begin
           s := Socket.ReceiveText;
 
-          if not (ReceivingFile) then
+          if not(ReceivingFile) then
           begin
 
             if (Pos('<|DIRECTORYTOSAVE|>', s) > 0) then
@@ -1814,7 +1787,7 @@ begin
                   begin
                     frm_ShareFiles.Download_ProgressBar.Max := FileSize;
                     frm_ShareFiles.Download_ProgressBar.Position := 0;
-                    frm_ShareFiles.SizeDownload_Label.Caption := 'Size: ' + getSize(FileStream.Size) + ' / ' + GetSize(FileSize);
+                    frm_ShareFiles.SizeDownload_Label.Caption := 'Size: ' + GetSize(FileStream.Size) + ' / ' + GetSize(FileSize);
                   end);
 
               Delete(s, 1, Pos('<<|', s) + 2);
@@ -1830,21 +1803,21 @@ begin
                 procedure
                 begin
                   frm_ShareFiles.Download_ProgressBar.Position := FileStream.Size;
-                  frm_ShareFiles.SizeDownload_Label.Caption := 'Size: ' + getSize(FileStream.Size) + ' / ' + GetSize(FileSize);
+                  frm_ShareFiles.SizeDownload_Label.Caption := 'Size: ' + GetSize(FileStream.Size) + ' / ' + GetSize(FileSize);
                 end)
             else
-              frm_Main.Main_Socket.Socket.SendText('<|REDIRECT|><|UPLOADPROGRESS|>' + intToStr(FileStream.Size) + '<<|');
-			  
+              frm_Main.Main_Socket.Socket.SendText('<|REDIRECT|><|UPLOADPROGRESS|>' + IntToStr(FileStream.Size) + '<<|');
+
             if (FileStream.Size = FileSize) then
             begin
               FreeAndNil(FileStream);
-			  
+
               if (FileExists(frm_ShareFiles.DirectoryToSaveFile)) then
                 DeleteFile(frm_ShareFiles.DirectoryToSaveFile);
-				
+
               RenameFile(frm_ShareFiles.DirectoryToSaveFile + '.tmp', frm_ShareFiles.DirectoryToSaveFile);
-			  
-              if not (frm_Main.Viewer) then
+
+              if not(frm_Main.Viewer) then
                 frm_Main.Main_Socket.Socket.SendText('<|REDIRECT|><|UPLOADCOMPLETE|>')
               else
                 Synchronize(
@@ -1855,10 +1828,10 @@ begin
                     frm_ShareFiles.SizeDownload_Label.Caption := 'Size: 0 B / 0 B';
                     Application.MessageBox('Download complete!', 'AllaKore Remote - Share Files', 64);
                   end);
-				  
-              ReceivingFile := False;
+
+              ReceivingFile := false;
             end;
-			
+
           end;
 
         end;
@@ -1875,5 +1848,7 @@ begin
 
 end;
 
-end.
 
+
+end.
+

@@ -1,6 +1,6 @@
 object frm_Main: Tfrm_Main
-  Left = 0
-  Top = 0
+  Left = 574
+  Top = 254
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'AllaKore Remote (BETA)'
@@ -8502,7 +8502,6 @@ object frm_Main: Tfrm_Main
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    StyleElements = [seClient, seBorder]
   end
   object Title2_Label: TLabel
     Left = 191
@@ -8516,7 +8515,6 @@ object frm_Main: Tfrm_Main
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    StyleElements = [seClient, seBorder]
   end
   object background_label_Image3: TImage
     Left = 24
@@ -9183,7 +9181,6 @@ object frm_Main: Tfrm_Main
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    StyleElements = [seClient, seBorder]
   end
   object Status_Image: TImage
     Left = 8
@@ -11490,13 +11487,61 @@ object frm_Main: Tfrm_Main
       C900D5D9D5CEBF970000000049454E44AE426082}
     Visible = False
   end
+  object Connect_BitBtn: TBitBtn
+    Left = 143
+    Top = 301
+    Width = 178
+    Height = 36
+    Cursor = crHandPoint
+    Caption = 'Connect to PC'
+    TabOrder = 0
+    OnClick = Connect_BitBtnClick
+  end
+  object About_BitBtn: TBitBtn
+    Left = 272
+    Top = 397
+    Width = 64
+    Height = 26
+    Cursor = crHandPoint
+    Caption = 'About'
+    TabOrder = 1
+    OnClick = About_BitBtnClick
+  end
+  object TargetID_MaskEdit: TMaskEdit
+    Left = 143
+    Top = 274
+    Width = 176
+    Height = 21
+    Alignment = taCenter
+    EditMask = '99-999-999;1;_'
+    MaxLength = 10
+    TabOrder = 2
+    Text = '  -   -   '
+    OnKeyPress = TargetID_MaskEditKeyPress
+  end
+  object mmAtual: TMemo
+    Left = 79
+    Top = 347
+    Width = 68
+    Height = 36
+    TabOrder = 3
+    Visible = False
+  end
+  object mmNova: TMemo
+    Left = 153
+    Top = 348
+    Width = 68
+    Height = 36
+    TabOrder = 4
+    Visible = False
+  end
   object GroupBox1: TGroupBox
     Left = 8
     Top = 120
     Width = 328
     Height = 105
     Caption = ' This PC '
-    TabOrder = 0
+    TabOrder = 5
     object background_label_Image: TImage
       Left = 16
       Top = 24
@@ -12162,7 +12207,6 @@ object frm_Main: Tfrm_Main
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      StyleElements = [seClient, seBorder]
     end
     object background_label_Image2: TImage
       Left = 16
@@ -12829,7 +12873,6 @@ object frm_Main: Tfrm_Main
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      StyleElements = [seClient, seBorder]
     end
     object YourID_Edit: TEdit
       Left = 135
@@ -12851,54 +12894,6 @@ object frm_Main: Tfrm_Main
       TabOrder = 1
       Text = 'Receiving...'
     end
-  end
-  object Connect_BitBtn: TBitBtn
-    Left = 143
-    Top = 301
-    Width = 178
-    Height = 36
-    Cursor = crHandPoint
-    Caption = 'Connect to PC'
-    TabOrder = 1
-    OnClick = Connect_BitBtnClick
-  end
-  object About_BitBtn: TBitBtn
-    Left = 272
-    Top = 397
-    Width = 64
-    Height = 26
-    Cursor = crHandPoint
-    Caption = 'About'
-    TabOrder = 2
-    OnClick = About_BitBtnClick
-  end
-  object TargetID_MaskEdit: TMaskEdit
-    Left = 143
-    Top = 274
-    Width = 178
-    Height = 21
-    Alignment = taCenter
-    EditMask = '999-999-999;1;_'
-    MaxLength = 11
-    TabOrder = 3
-    Text = '   -   -   '
-    OnKeyPress = TargetID_MaskEditKeyPress
-  end
-  object mmAtual: TMemo
-    Left = 79
-    Top = 347
-    Width = 68
-    Height = 36
-    TabOrder = 4
-    Visible = False
-  end
-  object mmNova: TMemo
-    Left = 153
-    Top = 348
-    Width = 68
-    Height = 36
-    TabOrder = 5
-    Visible = False
   end
   object Reconnect_Timer: TTimer
     Interval = 5000

@@ -9,7 +9,6 @@ uses
 
 type
   Tfrm_Password = class(TForm)
-    BackgroundTop_Image: TImage;
     Ok_BitBtn: TBitBtn;
     Password_Edit: TEdit;
     PasswordIcon_Image: TImage;
@@ -43,7 +42,7 @@ begin
     begin
       Status_Image.Picture.Assign(Image3.Picture);
       Status_Label.Caption := 'Access canceled.';
-      TargetID_MaskEdit.Enabled := true;
+    TargetID_MaskEdit.Enabled := true;
       Connect_BitBtn.Enabled := true;
     end;
   end;

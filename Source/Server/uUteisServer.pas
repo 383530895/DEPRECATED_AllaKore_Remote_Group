@@ -21,11 +21,11 @@ interface
  function EnDecryptString(StrValue : String; Key: Word) : String;
  function ActiveProcess(AValue: String = ''): Boolean;
  function GetPort : Integer;
-
+ function GenerateIDUnique(mac, hd: string): string;
 
 var
   Port : Integer;
-  Group, Machine: string;
+  Group, Machine, MAC, HD: string;
 
  implementation
 
@@ -87,5 +87,57 @@ begin
      end;
   Result := StrToInt(GetIni(ExtractFilePath(Application.ExeName) + Application.Title+'.ini', cGeneral, cPort, True));
 end;
+
+function GenerateIDUnique(mac, hd: string): string;
+function LetToNum(Str: String): String;
+const
+  Cad1: String = 'ABCDEF';
+  Cad2: String = '123456';
+var
+  x, y: integer;
+begin
+  Result := '';
+  for y := 1 to Length(Str) do
+  begin
+    x := Pos(Str[y], Cad1);
+    if x > 0 then
+    Result := Result + Copy(Cad2,x,1)
+    else
+    Result := Result + Copy(str,y,1);
+  end;
+end;
+  function RemoveChrInvalidos(Str: string): string;
+  var
+    x: integer;
+    ret: string;
+  begin
+    ret := '';
+    for x := 1 to Length(Str) do
+    begin
+      if (Str[x] <> '-') and (Str[x] <> '.') and (Str[x] <> ',') and (Str[x] <> '/') then
+        ret := ret + Str[x];
+    end;
+    RemoveChrInvalidos := Trim(TrimRight(ret));
+  end;
+
+var
+  AMac, AHD, S: string;
+  sID1, sID2, sID3:string;
+begin
+  AMac := RemoveChrInvalidos(mac);
+  AHD := RemoveChrInvalidos(mac);
+
+  S := AMac + AHD; // sem o caracteres inválidos
+
+  S := LetToNum(S); // Trocado as letras pelos numeros;
+//  Memo1.Lines.Add(s);
+
+  sID1 := Copy(s,StrToIntDef(Copy(s,1,1),1),2);
+  sID2 := Copy(s,StrToIntDef(Copy(s,10,1),2),3);
+  sID3 := Copy(s,StrToIntDef(Copy(s,length(s)-3,1),3),3);
+  Result := sID1 + '-'+ sID2  +'-'+ sID3;
+
+end;
+
 end.
 
