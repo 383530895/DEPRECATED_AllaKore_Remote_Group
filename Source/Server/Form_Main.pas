@@ -155,8 +155,6 @@ begin
   FreeOnTerminate := True;
 end;
 
-
-
 // Get current Version
 function GetAppVersionStr: string;
 type
@@ -182,7 +180,6 @@ begin
     LongRec(FixedPtr.dwFileVersionLS).Lo]) //build
 end;
 
-function GenerateID(): string;
 var
   i: Integer;
   ID: string;
@@ -193,7 +190,8 @@ begin
   while true do
   begin
     Randomize;
-    ID := IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + '-' + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + '-' + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9));
+    //ID := IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + '-' + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + '-' + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9));
+    ID := GenerateIDUnique(strMAC,strHD); // Add 05/11/2015 Solivan
 
     i := 0;
     while i < frm_Main.Connections_ListView.Items.Count - 1 do
@@ -344,6 +342,19 @@ begin
          Delete(s2, 1, Pos('<|MACHINE|>', s)+ 10);
          Machine := s2;
          Machine := Copy(s2, 1, Pos('<<|', s2) - 1);
+
+         // Get the MAC Adress
+         s2 := s;
+         Delete(s2, 1, Pos('<|MAC|>', s)+ 6);
+         MAC := s2;
+         MAC := Copy(s2, 1, Pos('<<|', s2) - 1);
+
+         // Get the HD Adress
+         s2 := s;
+         Delete(s2, 1, Pos('<|HD|>', s)+ 5);
+         HD := s2;
+         HD := Copy(s2, 1, Pos('<<|', s2) - 1);
+
         end;
 
         break; // Break the while
@@ -404,17 +415,19 @@ var
   L: TListItem;
 begin
   L := nil;
-  ID := GenerateID;
+  ID := GenerateID(MAC,HD);
   Password := GeneratePassword;
   L := frm_Main.Connections_ListView.Items.Add;
   L.Caption := IntToStr(AThread_Main.Handle);
   L.SubItems.Add(AThread_Main.Connection.Socket.Binding.PeerIP);
-  L.SubItems.Add(ID);
+  L.SubItems.Add(StringReplace(ID,' ','',[rfReplaceAll]));
   L.SubItems.Add(Password);
   L.SubItems.Add('');
   L.SubItems.Add('Calculating...');
   L.SubItems.Add(Group);   //Marcones Freitas - 16/10/2015 -> Add the Group .ini
   L.SubItems.Add(Machine); //Marcones Freitas - 16/10/2015 -> Add the Machine .ini
+  L.SubItems.Add(MAC);     //Solivan Araujo - 16/10/2015 -> Add the MAC Client
+  L.SubItems.Add(HD);     //Solivan Araujo - 16/10/2015 -> Add the HD Client    
   L.SubItems.Objects[4] := TObject(0);
 end;
 
@@ -453,6 +466,7 @@ begin
         Delete(s2, 1, Pos('<|FINDID|>', s2) + 9);
 
         TargetID := Copy(s2, 1, Pos('<<|', s2) - 1);
+
 
         if (CheckIDExists(TargetID)) then
           if (FindListItemID(TargetID).SubItems[3] = '') then
@@ -591,42 +605,13 @@ begin
     L2 := FindListItemID(TargetID);
 
     L.SubItems[3] := TargetID;
-    L2.SubItems[3] := ID;
+    L2.SubItems[3] := StringReplace(ID,' ','',[rfReplaceAll]);
   end;
 
 end;
 
 { TThreadConnection_Desktop }
 // The connection type is the Desktop Screens
-procedure TThreadConnection_Desktop.Execute;
-var
-  s: string;
-  L: TListItem;
-begin
-  inherited;
-
-  L := nil;
-
-  L := FindListItemID(MyID);
-  L.SubItems.Objects[1] := TObject(Self);
-
-  while AThread_Desktop.Connection.Connected do
-  begin
-
-    s := AThread_Desktop.Connection.CurrentReadBuffer;
-
-    if (Length(s) < 1) then
-      break;
-
-    try
-      AThread_Desktop_Target.Connection.Write(s);
-    except
-    end;
-    Sleep(5); // Avoids using 100% CPU
-
-  end;
-
-end;
 
 // The connection type is the Keyboard Remote
 procedure TThreadConnection_Keyboard.Execute;
@@ -742,9 +727,38 @@ begin
      begin
       vID    := Connections_ListView.Items[Connections_ListView.Selected.Index].SubItems[1];
       vSenha := Connections_ListView.Items[Connections_ListView.Selected.Index].SubItems[2];
-      vPath  := ExtractFilePath(Application.ExeName)+'AllaKore_Remote_Client.exe';
+      vPath  := ExtractFilePath(Application.ExeName)+'RDPView.exe';
       ShellExecute(handle,'open',PChar(vPath), PChar(vID+' '+vSenha),'',SW_SHOWNORMAL);
      end;
+end;
+
+procedure TThreadConnection_Desktop.Execute;
+var
+  s: string;
+  L: TListItem;
+begin
+  inherited;
+
+  L := nil;
+
+  L := FindListItemID(MyID);
+  L.SubItems.Objects[1] := TObject(Self);
+
+  while AThread_Desktop.Connection.Connected do
+  begin
+
+    s := AThread_Desktop.Connection.CurrentReadBuffer;
+
+    if (Length(s) < 1) then
+      break;
+
+    try
+      AThread_Desktop_Target.Connection.Write(s);
+    except
+    end;
+    Sleep(5); // Avoids using 100% CPU
+
+  end;
 end;
 
 end.

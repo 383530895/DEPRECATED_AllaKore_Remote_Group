@@ -1,9 +1,9 @@
 object frm_Main: Tfrm_Main
-  Left = 192
-  Top = 125
-  Width = 779
+  Left = 322
+  Top = 144
+  Width = 996
   Height = 589
-  Caption = 'AllaKore Remote - Server (BETA)'
+  Caption = 'RDP Server  (BETA)'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,21 +17,18 @@ object frm_Main: Tfrm_Main
   TextHeight = 13
   object Splitter1: TSplitter
     Left = 0
-    Top = 389
-    Width = 771
+    Top = 385
+    Width = 980
     Height = 3
     Cursor = crVSplit
     Align = alBottom
   end
   object Logs_Memo: TMemo
     Left = 0
-    Top = 392
-    Width = 771
+    Top = 388
+    Width = 980
     Height = 163
     Align = alBottom
-    Lines.Strings = (
-      'Exceptions Log:'
-      '')
     ReadOnly = True
     ScrollBars = ssBoth
     TabOrder = 1
@@ -39,8 +36,8 @@ object frm_Main: Tfrm_Main
   object Connections_ListView: TListView
     Left = 0
     Top = 0
-    Width = 771
-    Height = 389
+    Width = 980
+    Height = 385
     Align = alClient
     Columns = <
       item
@@ -73,6 +70,14 @@ object frm_Main: Tfrm_Main
       end
       item
         Caption = 'Machine'
+        Width = 100
+      end
+      item
+        Caption = 'MAC'
+        Width = 100
+      end
+      item
+        Caption = 'HD'
         Width = 100
       end>
     GridLines = True

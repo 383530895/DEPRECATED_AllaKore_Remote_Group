@@ -1,6 +1,6 @@
 object frm_Password: Tfrm_Password
-  Left = 0
-  Top = 0
+  Left = 465
+  Top = 256
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'Password'
@@ -4798,7 +4798,6 @@ object frm_Password: Tfrm_Password
     Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     ParentFont = False
-    StyleElements = [seClient, seBorder]
   end
   object Ok_BitBtn: TBitBtn
     Left = 190

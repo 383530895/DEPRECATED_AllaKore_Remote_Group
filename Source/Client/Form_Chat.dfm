@@ -1,6 +1,6 @@
 object frm_Chat: Tfrm_Chat
-  Left = 0
-  Top = 0
+  Left = 918
+  Top = 320
   Caption = 'Chat'
   ClientHeight = 301
   ClientWidth = 214
@@ -40,6 +40,5 @@ object frm_Chat: Tfrm_Chat
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 1
-    Zoom = 100
   end
 end
