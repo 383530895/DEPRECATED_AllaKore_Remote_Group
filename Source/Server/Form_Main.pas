@@ -113,7 +113,8 @@ var
 
 implementation
 
-uses uUteisServer;
+uses uUteisServer,
+  Math;
 
 {$R *.dfm}
 
@@ -191,7 +192,6 @@ begin
   while true do
   begin
     Randomize;
-    //ID := IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + '-' + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + '-' + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9));
     ID := GenerateIDUnique(strMAC,strHD); // Add 05/11/2015 Solivan
 
     i := 0;
@@ -216,10 +216,13 @@ begin
 
 end;
 
-function GeneratePassword(): string;
+function GeneratePassword(LastPassword:string): string;
 begin
   Randomize;
-  Result := IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9));
+  if (LastPassword <> '') then
+    Result := LastPassword
+  else
+    Result := IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9)) + IntToStr(Random(9));
 end;
 
 function FindListItemID(ID: string): TListItem;
@@ -356,6 +359,12 @@ begin
          HD := s2;
          HD := Copy(s2, 1, Pos('<<|', s2) - 1);
 
+         // Get the HD Adress
+         s2 := s;
+         Delete(s2, 1, Pos('<|LASTPASSWORD|>', s)+ 15);
+         LastPassword := s2;
+         LastPassword := Copy(s2, 1, Pos('<<|', s2) - 1);
+
         end;
 
         break; // Break the while
@@ -417,11 +426,12 @@ var
 begin
   L := nil;
   ID := GenerateID(MAC,HD);
-  Password := GeneratePassword;
+  Password := GeneratePassword(LastPassword);
   L := frm_Main.Connections_ListView.Items.Add;
   L.Caption := IntToStr(AThread_Main.Handle);
   L.SubItems.Add(AThread_Main.Connection.Socket.Binding.PeerIP);
   L.SubItems.Add(StringReplace(ID,' ','',[rfReplaceAll]));
+
   L.SubItems.Add(Password);
   L.SubItems.Add('');
   L.SubItems.Add('Calculating...');
@@ -538,9 +548,6 @@ begin
       // Warns Access
         (L.SubItems.Objects[0] as TThreadConnection_Main).AThread_Main_Target.Connection.Write('<|ACCESSING|>');
       end;
-
-
-
 
     // Redirect commands
       if (Pos('<|REDIRECT|>', s) > 0) then
@@ -728,7 +735,7 @@ begin
      begin
       vID    := Connections_ListView.Items[Connections_ListView.Selected.Index].SubItems[1];
       vSenha := Connections_ListView.Items[Connections_ListView.Selected.Index].SubItems[2];
-      vPath  := ExtractFilePath(Application.ExeName)+'RDPView.exe';
+      vPath  := ExtractFilePath(Application.ExeName)+'AllaKore_Remote_Client.exe';
       ShellExecute(handle,'open',PChar(vPath), PChar(vID+' '+vSenha),'',SW_SHOWNORMAL);
      end;
 end;

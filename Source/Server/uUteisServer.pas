@@ -25,7 +25,7 @@ interface
 
 var
   Port : Integer;
-  Group, Machine, MAC, HD: string;
+  Group, Machine, MAC, HD, LastPassword: string;
 
  implementation
 

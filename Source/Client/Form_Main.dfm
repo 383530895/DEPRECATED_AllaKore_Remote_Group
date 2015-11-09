@@ -12892,7 +12892,6 @@ object frm_Main: Tfrm_Main
       Alignment = taCenter
       ReadOnly = True
       TabOrder = 1
-      Text = 'Receiving...'
     end
   end
   object Reconnect_Timer: TTimer

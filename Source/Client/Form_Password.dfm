@@ -4815,7 +4815,6 @@ object frm_Password: Tfrm_Password
     Width = 257
     Height = 21
     Alignment = taCenter
-    PasswordChar = '*'
     TabOrder = 0
     OnKeyPress = Password_EditKeyPress
   end

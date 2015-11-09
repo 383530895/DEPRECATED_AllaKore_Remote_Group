@@ -42,7 +42,7 @@ begin
     begin
       Status_Image.Picture.Assign(Image3.Picture);
       Status_Label.Caption := 'Access canceled.';
-    TargetID_MaskEdit.Enabled := true;
+      TargetID_MaskEdit.Enabled := true;
       Connect_BitBtn.Enabled := true;
     end;
   end;
@@ -52,12 +52,19 @@ procedure Tfrm_Password.FormShow(Sender: TObject);
 begin
   Canceled := true;
   Password_Edit.Clear;
+
+  // verifica se o último TargetID é igual ao TargetID Atual, ou seja, o mesmo client
+  if copy(frm_Main.LastPassWordClient,1,Pos('|',frm_Main.LastPassWordClient) -1) = frm_Main.TargetID_MaskEdit.Text then
+  Password_Edit.Text := copy(frm_Main.LastPassWordClient,Pos('|',frm_Main.LastPassWordClient) + 1);
+
   Password_Edit.SetFocus;
+
 end;
 
 procedure Tfrm_Password.Ok_BitBtnClick(Sender: TObject);
 begin
   frm_Main.Main_Socket.Socket.SendText('<|CHECKIDPASSWORD|>' + frm_Main.TargetID_MaskEdit.Text + '<|>' + Password_Edit.Text + '<<|');
+  frm_Main.LastPassWordClient := frm_Main.TargetID_MaskEdit.Text + '|' + Password_Edit.Text;
   Canceled := false;
   Close;
 end;
