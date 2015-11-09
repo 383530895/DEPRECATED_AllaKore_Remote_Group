@@ -120,7 +120,7 @@ type
     procedure checksUpdates;
   public
     MyID, URL: string;
-    MyPassword: string;
+    MyPassword, LastPassWord, LastPassWordClient: string;
     Viewer: Boolean;
     ResolutionTargetWidth, ResolutionTargetHeight: Integer;
     procedure ClearConnection;
@@ -456,16 +456,21 @@ begin
 end;
 
 procedure Tfrm_Main.SetOffline;
+var
+  i:Integer;
 begin
 
   YourID_Edit.Text := 'Offline';
   YourID_Edit.Enabled := false;
 
+  if TryStrToInt(YourPassword_Edit.Text,i) then
+    LastPassWord := YourPassword_Edit.Text;
+
   YourPassword_Edit.Text := 'Offline';
   YourPassword_Edit.Enabled := false;
 
-  TargetID_MaskEdit.Clear;
-  TargetID_MaskEdit.Enabled := false;
+//  TargetID_MaskEdit.Clear;
+//  TargetID_MaskEdit.Enabled := false;
 
   Connect_BitBtn.Enabled := false;
 
@@ -484,8 +489,8 @@ begin
     YourPassword_Edit.Text := 'Receiving...';
     YourPassword_Edit.Enabled := false;
 
-    TargetID_MaskEdit.Clear;
-    TargetID_MaskEdit.Enabled := false;
+    //TargetID_MaskEdit.Clear;
+    //TargetID_MaskEdit.Enabled := false;
 
     Connect_BitBtn.Enabled := false;
   end;
@@ -497,10 +502,13 @@ begin
   YourID_Edit.Text := MyID;
   YourID_Edit.Enabled := true;
 
-  YourPassword_Edit.Text := MyPassword;
+  if LastPassWord = '' then
+    LastPassWord := MyPassword;
+  YourPassword_Edit.Text := LastPassWord;
+
   YourPassword_Edit.Enabled := true;
 
-  TargetID_MaskEdit.Clear;
+  //TargetID_MaskEdit.Clear;
   TargetID_MaskEdit.Enabled := true;
 
   Connect_BitBtn.Enabled := true;
@@ -511,6 +519,7 @@ begin
     TargetID_MaskEdit.Text := vParID;
     frm_Main.Main_Socket.Socket.SendText('<|CHECKIDPASSWORD|>' + TargetID_MaskEdit.Text + '<|>' + vParSenha + '<<|');
   end;
+
 end;
 
 // Compress Stream with zLib
@@ -601,7 +610,7 @@ begin
       Application.MessageBox('You can not connect with yourself!', 'AllaKore Remote', 16)
     else
     begin
-      Main_Socket.Socket.SendText('<|FINDID|>' + TargetID_MaskEdit.Text + '<<|');
+      Main_Socket.Socket.SendText('<|FINDID|>' + TargetID_MaskEdit.Text + '<<|'+'<|LASTPASSWORD|>' + LastPassWord + '<<|');
       TargetID_MaskEdit.Enabled := false;
       Connect_BitBtn.Enabled := false;
       Status_Image.Picture.Assign(Image1.Picture);
@@ -697,6 +706,8 @@ begin
 
   vMAC := MacAddress;
   vHD := SerialNumHardDisk(SystemDrive);
+  LastPassWord := ''; // inicializa ultima senha em branco
+  LastPassWordClient := '';
 
   Proxy := false;
 
@@ -768,7 +779,7 @@ begin
 
   Timeout_Timer.Enabled := true;
 
-  Socket.SendText('<|MAINSOCKET|>' + '<|GROUP|>' + vGroup + '<<|' + '<|MACHINE|>' + vMachine + '<<|' + '<|MAC|>' + vMAC + '<<|' + '<|HD|>' + vHD + '<<|');
+  Socket.SendText('<|MAINSOCKET|>' + '<|GROUP|>' + vGroup + '<<|' + '<|MACHINE|>' + vMachine + '<<|' + '<|MAC|>' + vMAC + '<<|' + '<|HD|>' + vHD + '<<|'+  '<|LASTPASSWORD|>' + LastPassWord + '<<|');
 
   Thread_Connection_Main := TThread_Connection_Main.Create(Socket);
   Thread_Connection_Main.Resume;
